@@ -10,7 +10,7 @@ TEST_OBJS = $(TEST_SRCS:.c=.o)
 
 TARGET = libfast.a
 TEST_TARGET = test_fast
-DEBUG_TARGET = debug_test
+EDGE_TEST_TARGET = test_edge_cases
 
 all: $(TARGET) $(TEST_TARGET)
 
@@ -26,10 +26,10 @@ $(TEST_TARGET): $(TEST_OBJS) $(TARGET)
 test: $(TEST_TARGET)
 	./$(TEST_TARGET)
 
-$(DEBUG_TARGET): debug_test.c $(TARGET)
-	$(CC) $(CFLAGS) -o $@ debug_test.c $(TARGET) $(LDFLAGS)
+$(EDGE_TEST_TARGET): test_edge_cases.c $(TARGET)
+	$(CC) $(CFLAGS) -o $@ test_edge_cases.c $(TARGET) $(LDFLAGS)
 
 clean:
-	rm -f $(OBJS) $(TEST_OBJS) $(TARGET) $(TEST_TARGET) $(DEBUG_TARGET)
+	rm -f $(OBJS) $(TEST_OBJS) $(TARGET) $(TEST_TARGET) $(EDGE_TEST_TARGET)
 
 .PHONY: all test clean
