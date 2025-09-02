@@ -23,10 +23,34 @@ calculate_recommended_params(fast_params_t *params, uint32_t radix, uint32_t wor
     params->word_length = word_length;
     params->sbox_count  = FAST_SBOX_POOL_SIZE;
 
-    params->branch_dist1 = (uint32_t) ceil(sqrt(word_length));
-    params->branch_dist2 = params->branch_dist1;
+    // Set branch distances according to FAST paper formulas
+    // w = min(floor(sqrt(ℓ)), ℓ - 2)
+    uint32_t sqrt_ell    = (uint32_t) floor(sqrt(word_length));
+    params->branch_dist1 = (sqrt_ell < word_length - 2) ? sqrt_ell : (word_length - 2);
 
-    params->num_layers = (uint32_t) ceil(pow(word_length, 1.5));
+    // w' = max(1, w - 1)
+    params->branch_dist2 = (params->branch_dist1 > 1) ? (params->branch_dist1 - 1) : 1;
+
+    // Set number of layers according to FAST paper for 128-bit security
+    // Formula: n = ℓ × 2 × max(s/√(ℓ log2 m), s√ℓ/ln(a-1), s√ℓ/log2(a-1))
+    uint32_t s = 128; // Security parameter
+    uint32_t m = FAST_SBOX_POOL_SIZE;
+
+    double term1 = s / sqrt(word_length * log2(m));
+    double term2 = s * sqrt(word_length) / log(radix - 1);
+    double term3 = s * sqrt(word_length) / log2(radix - 1);
+
+    double max_term = term1;
+    if (term2 > max_term)
+        max_term = term2;
+    if (term3 > max_term)
+        max_term = term3;
+
+    params->num_layers = (uint32_t) ceil(word_length * 2 * max_term);
+
+    // Ensure n is a multiple of ℓ as required by the paper
+    uint32_t rounds    = (params->num_layers + word_length - 1) / word_length;
+    params->num_layers = rounds * word_length;
 
     if (params->branch_dist1 >= word_length) {
         params->branch_dist1 = word_length - 1;
