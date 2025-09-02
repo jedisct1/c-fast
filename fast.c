@@ -28,11 +28,11 @@ calculate_recommended_params(fast_params_t *params, uint32_t radix, uint32_t wor
 
     params->num_layers = (uint32_t) ceil(pow(word_length, 1.5));
 
-    if (params->branch_dist1 > word_length) {
-        params->branch_dist1 = word_length;
+    if (params->branch_dist1 >= word_length) {
+        params->branch_dist1 = word_length - 1;
     }
-    if (params->branch_dist2 > word_length) {
-        params->branch_dist2 = word_length;
+    if (params->branch_dist2 >= word_length) {
+        params->branch_dist2 = word_length - 1;
     }
 
     return 0;
