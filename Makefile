@@ -11,6 +11,8 @@ TEST_OBJS = $(TEST_SRCS:.c=.o)
 TARGET = libfast.a
 TEST_TARGET = test_fast
 EDGE_TEST_TARGET = test_edge_cases
+BENCHMARK_TARGET = benchmark_fast
+DIFFUSION_TARGET = test_diffusion
 
 all: $(TARGET) $(TEST_TARGET)
 
@@ -29,7 +31,19 @@ test: $(TEST_TARGET)
 $(EDGE_TEST_TARGET): test_edge_cases.c $(TARGET)
 	$(CC) $(CFLAGS) -o $@ test_edge_cases.c $(TARGET) $(LDFLAGS)
 
-clean:
-	rm -f $(OBJS) $(TEST_OBJS) $(TARGET) $(TEST_TARGET) $(EDGE_TEST_TARGET)
+$(BENCHMARK_TARGET): benchmark_fast.c $(TARGET)
+	$(CC) $(CFLAGS) -o $@ benchmark_fast.c $(TARGET) $(LDFLAGS)
 
-.PHONY: all test clean
+$(DIFFUSION_TARGET): test_diffusion.c $(TARGET)
+	$(CC) $(CFLAGS) -o $@ test_diffusion.c $(TARGET) $(LDFLAGS)
+
+benchmark: $(BENCHMARK_TARGET)
+	./$(BENCHMARK_TARGET)
+
+diffusion: $(DIFFUSION_TARGET)
+	./$(DIFFUSION_TARGET)
+
+clean:
+	rm -f $(OBJS) $(TEST_OBJS) $(TARGET) $(TEST_TARGET) $(EDGE_TEST_TARGET) $(BENCHMARK_TARGET) $(DIFFUSION_TARGET)
+
+.PHONY: all test clean benchmark diffusion

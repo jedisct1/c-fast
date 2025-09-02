@@ -2,30 +2,52 @@
 #include <stdlib.h>
 #include <string.h>
 
-void
-generate_sbox(sbox_t *sbox, uint32_t radix, prng_state_t *prng)
+static int
+allocate_sbox_arrays(sbox_t *sbox, uint32_t radix)
 {
-    if (!sbox || radix == 0 || radix > FAST_MAX_RADIX || !prng) {
-        return;
-    }
-
     sbox->perm = malloc(radix * sizeof(uint8_t));
     if (!sbox->perm) {
-        return;
+        return -1;
+    }
+
+    sbox->inv = malloc(radix * sizeof(uint8_t));
+    if (!sbox->inv) {
+        free(sbox->perm);
+        sbox->perm = NULL;
+        return -1;
     }
 
     sbox->radix = radix;
+    return 0;
+}
+
+int
+generate_sbox(sbox_t *sbox, uint32_t radix, prng_state_t *prng)
+{
+    if (!sbox || radix == 0 || radix > FAST_MAX_RADIX || !prng) {
+        return -1;
+    }
+
+    if (allocate_sbox_arrays(sbox, radix) != 0) {
+        return -1;
+    }
 
     for (uint32_t i = 0; i < radix; i++) {
-        sbox->perm[i] = i;
+        sbox->perm[i] = (uint8_t) i;
     }
 
-    for (uint32_t i = radix - 1; i > 0; i--) {
-        uint32_t j    = prng_get_uint32(prng, i + 1);
-        uint8_t  temp = sbox->perm[i];
-        sbox->perm[i] = sbox->perm[j];
-        sbox->perm[j] = temp;
+    for (uint32_t i = radix; i > 1; i--) {
+        uint32_t j    = prng_uniform(prng, i);
+        uint8_t  temp = sbox->perm[i - 1];
+        sbox->perm[i - 1] = sbox->perm[j];
+        sbox->perm[j]     = temp;
     }
+
+    for (uint32_t i = 0; i < radix; i++) {
+        sbox->inv[sbox->perm[i]] = (uint8_t) i;
+    }
+
+    return 0;
 }
 
 int
@@ -44,10 +66,10 @@ generate_sbox_pool(sbox_pool_t *pool, uint32_t count, uint32_t radix, prng_state
     pool->radix = radix;
 
     for (uint32_t i = 0; i < count; i++) {
-        generate_sbox(&pool->sboxes[i], radix, prng);
-        if (!pool->sboxes[i].perm) {
+        if (generate_sbox(&pool->sboxes[i], radix, prng) != 0) {
             for (uint32_t j = 0; j < i; j++) {
                 free(pool->sboxes[j].perm);
+                free(pool->sboxes[j].inv);
             }
             free(pool->sboxes);
             pool->sboxes = NULL;
@@ -69,6 +91,9 @@ free_sbox_pool(sbox_pool_t *pool)
         if (pool->sboxes[i].perm) {
             free(pool->sboxes[i].perm);
         }
+        if (pool->sboxes[i].inv) {
+            free(pool->sboxes[i].inv);
+        }
     }
 
     free(pool->sboxes);
@@ -83,24 +108,21 @@ apply_sbox(const sbox_t *sbox, uint8_t *data)
         return;
     }
 
-    if (*data < sbox->radix) {
-        *data = sbox->perm[*data];
+    uint32_t value = *data;
+    if (value < sbox->radix) {
+        *data = sbox->perm[value];
     }
 }
 
 void
 apply_inverse_sbox(const sbox_t *sbox, uint8_t *data)
 {
-    if (!sbox || !sbox->perm || !data) {
+    if (!sbox || !sbox->inv || !data) {
         return;
     }
 
-    if (*data < sbox->radix) {
-        for (uint32_t i = 0; i < sbox->radix; i++) {
-            if (sbox->perm[i] == *data) {
-                *data = i;
-                break;
-            }
-        }
+    uint32_t value = *data;
+    if (value < sbox->radix) {
+        *data = sbox->inv[value];
     }
 }

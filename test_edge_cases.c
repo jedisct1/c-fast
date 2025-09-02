@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+static const uint8_t EDGE_TWEAK[]    = { 0x10, 0x20, 0x30, 0x40 };
+static const size_t  EDGE_TWEAK_LEN = sizeof(EDGE_TWEAK);
+
 void
 test_w_zero_case()
 {
@@ -31,11 +34,11 @@ test_w_zero_case()
     printf("Testing with w=0, w'=2:\n");
     printf("  Plaintext:  %u %u %u %u\n", plaintext[0], plaintext[1], plaintext[2], plaintext[3]);
 
-    assert(fast_encrypt(ctx, plaintext, ciphertext, 4) == 0);
+    assert(fast_encrypt(ctx, EDGE_TWEAK, EDGE_TWEAK_LEN, plaintext, ciphertext, 4) == 0);
     printf("  Ciphertext: %u %u %u %u\n", ciphertext[0], ciphertext[1], ciphertext[2],
            ciphertext[3]);
 
-    assert(fast_decrypt(ctx, ciphertext, recovered, 4) == 0);
+    assert(fast_decrypt(ctx, EDGE_TWEAK, EDGE_TWEAK_LEN, ciphertext, recovered, 4) == 0);
     printf("  Recovered:  %u %u %u %u\n", recovered[0], recovered[1], recovered[2], recovered[3]);
 
     if (memcmp(plaintext, recovered, 4) == 0) {
@@ -59,7 +62,7 @@ test_minimum_parameters()
     fast_params_t params;
     params.radix        = 4; // Minimum radix
     params.word_length  = 2; // Minimum word length
-    params.branch_dist1 = 1;
+    params.branch_dist1 = 0;
     params.branch_dist2 = 1;
     params.num_layers   = 4;
     params.sbox_count   = 256;
@@ -74,10 +77,10 @@ test_minimum_parameters()
     printf("Testing with minimum parameters (radix=4, length=2):\n");
     printf("  Plaintext:  %u %u\n", plaintext[0], plaintext[1]);
 
-    assert(fast_encrypt(ctx, plaintext, ciphertext, 2) == 0);
+    assert(fast_encrypt(ctx, EDGE_TWEAK, EDGE_TWEAK_LEN, plaintext, ciphertext, 2) == 0);
     printf("  Ciphertext: %u %u\n", ciphertext[0], ciphertext[1]);
 
-    assert(fast_decrypt(ctx, ciphertext, recovered, 2) == 0);
+    assert(fast_decrypt(ctx, EDGE_TWEAK, EDGE_TWEAK_LEN, ciphertext, recovered, 2) == 0);
     printf("  Recovered:  %u %u\n", recovered[0], recovered[1]);
 
     if (memcmp(plaintext, recovered, 2) == 0) {
@@ -121,13 +124,13 @@ test_large_radix()
         printf("%3u ", plaintext[i]);
     printf("\n");
 
-    assert(fast_encrypt(ctx, plaintext, ciphertext, 8) == 0);
+    assert(fast_encrypt(ctx, EDGE_TWEAK, EDGE_TWEAK_LEN, plaintext, ciphertext, 8) == 0);
     printf("  Ciphertext: ");
     for (int i = 0; i < 8; i++)
         printf("%3u ", ciphertext[i]);
     printf("\n");
 
-    assert(fast_decrypt(ctx, ciphertext, recovered, 8) == 0);
+    assert(fast_decrypt(ctx, EDGE_TWEAK, EDGE_TWEAK_LEN, ciphertext, recovered, 8) == 0);
     printf("  Recovered:  ");
     for (int i = 0; i < 8; i++)
         printf("%3u ", recovered[i]);
@@ -161,13 +164,23 @@ test_determinism()
     uint8_t plaintext[6] = { 9, 8, 7, 6, 5, 4 };
     uint8_t ciphertext1[6], ciphertext2[6];
 
-    assert(fast_encrypt(ctx1, plaintext, ciphertext1, 6) == 0);
-    assert(fast_encrypt(ctx2, plaintext, ciphertext2, 6) == 0);
+    assert(fast_encrypt(ctx1, EDGE_TWEAK, EDGE_TWEAK_LEN, plaintext, ciphertext1, 6) == 0);
+    assert(fast_encrypt(ctx2, EDGE_TWEAK, EDGE_TWEAK_LEN, plaintext, ciphertext2, 6) == 0);
 
     if (memcmp(ciphertext1, ciphertext2, 6) == 0) {
         printf("✓ Determinism: Same key produces same ciphertext\n");
     } else {
         printf("✗ Determinism: Different ciphertexts from same key!\n");
+        exit(1);
+    }
+
+    uint8_t alt_tweak[] = { 0x90, 0x81, 0x72, 0x63 };
+    assert(sizeof(alt_tweak) == EDGE_TWEAK_LEN);
+    assert(fast_encrypt(ctx1, alt_tweak, EDGE_TWEAK_LEN, plaintext, ciphertext1, 6) == 0);
+    if (memcmp(ciphertext1, ciphertext2, 6) != 0) {
+        printf("✓ Different tweaks: Ciphertexts differ as expected\n");
+    } else {
+        printf("✗ Different tweaks: Ciphertexts unexpectedly match\n");
         exit(1);
     }
 

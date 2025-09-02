@@ -74,31 +74,37 @@ prng_get_bytes(prng_state_t *prng, uint8_t *output, size_t length)
 }
 
 uint32_t
-prng_get_uint32(prng_state_t *prng, uint32_t max)
+prng_next_u32(prng_state_t *prng)
 {
-    if (!prng || max == 0) {
+    if (!prng) {
         return 0;
     }
 
-    if (max == 1) {
+    uint8_t bytes[4];
+    prng_get_bytes(prng, bytes, sizeof(bytes));
+    return ((uint32_t) bytes[0] << 24) | ((uint32_t) bytes[1] << 16) |
+           ((uint32_t) bytes[2] << 8) | ((uint32_t) bytes[3]);
+}
+
+uint32_t
+prng_uniform(prng_state_t *prng, uint32_t bound)
+{
+    if (!prng || bound == 0) {
         return 0;
     }
 
-    uint32_t mask = 0xFFFFFFFF;
-    uint32_t top  = max - 1;
-    while (top < (mask >> 1)) {
-        mask >>= 1;
-    }
+    const uint64_t bound64    = (uint64_t) bound;
+    const uint32_t threshold  = (uint32_t) ((0u - bound) % bound);
+    uint32_t       r, low;
+    uint64_t       product;
 
-    uint32_t result;
     do {
-        uint8_t bytes[4];
-        prng_get_bytes(prng, bytes, 4);
-        result = (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
-        result &= mask;
-    } while (result >= max);
+        r        = prng_next_u32(prng);
+        product  = (uint64_t) r * bound64;
+        low      = (uint32_t) product;
+    } while (low < threshold);
 
-    return result;
+    return (uint32_t) (product >> 32);
 }
 
 void
@@ -112,4 +118,72 @@ prng_cleanup(prng_state_t *prng)
     memset(prng->counter, 0, FAST_AES_BLOCK_SIZE);
     memset(prng->buffer, 0, FAST_AES_BLOCK_SIZE);
     prng->buffer_pos = 0;
+}
+
+static void
+split_key_material(const uint8_t *key_material, uint8_t *key_out,
+                   uint8_t *iv_out, bool zeroize_iv_suffix)
+{
+    memcpy(key_out, key_material, FAST_AES_KEY_SIZE);
+    memcpy(iv_out, key_material + FAST_AES_KEY_SIZE, FAST_AES_BLOCK_SIZE);
+    if (zeroize_iv_suffix) {
+        iv_out[FAST_AES_BLOCK_SIZE - 1] = 0;
+        iv_out[FAST_AES_BLOCK_SIZE - 2] = 0;
+    }
+}
+
+int
+fast_generate_sequence(uint32_t *seq, uint32_t seq_length, uint32_t pool_size,
+                       const uint8_t *key_material, size_t key_len)
+{
+    if (!seq || seq_length == 0 || pool_size == 0 || !key_material ||
+        key_len < FAST_DERIVED_KEY_SIZE) {
+        return -1;
+    }
+
+    uint8_t key[FAST_AES_KEY_SIZE];
+    uint8_t iv[FAST_AES_BLOCK_SIZE];
+    split_key_material(key_material, key, iv, true);
+
+    prng_state_t prng;
+    if (prng_init(&prng, key, iv) != 0) {
+        memset(key, 0, sizeof(key));
+        memset(iv, 0, sizeof(iv));
+        return -1;
+    }
+
+    for (uint32_t i = 0; i < seq_length; i++) {
+        seq[i] = prng_uniform(&prng, pool_size);
+    }
+
+    prng_cleanup(&prng);
+    memset(key, 0, sizeof(key));
+    memset(iv, 0, sizeof(iv));
+    return 0;
+}
+
+int
+fast_generate_sbox_pool(sbox_pool_t *pool, uint32_t count, uint32_t radix,
+                        const uint8_t *key_material, size_t key_len)
+{
+    if (!pool || !key_material || key_len < FAST_DERIVED_KEY_SIZE) {
+        return -1;
+    }
+
+    uint8_t key[FAST_AES_KEY_SIZE];
+    uint8_t iv[FAST_AES_BLOCK_SIZE];
+    split_key_material(key_material, key, iv, false);
+
+    prng_state_t prng;
+    if (prng_init(&prng, key, iv) != 0) {
+        memset(key, 0, sizeof(key));
+        memset(iv, 0, sizeof(iv));
+        return -1;
+    }
+
+    int ret = generate_sbox_pool(pool, count, radix, &prng);
+    prng_cleanup(&prng);
+    memset(key, 0, sizeof(key));
+    memset(iv, 0, sizeof(iv));
+    return ret;
 }

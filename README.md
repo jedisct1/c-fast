@@ -50,11 +50,12 @@ fast_init(&ctx, &params, key);
 // Encrypt data
 uint8_t plaintext[16] = { /* input data */ };
 uint8_t ciphertext[16];
-fast_encrypt(ctx, plaintext, ciphertext, 16);
+uint8_t tweak[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
+fast_encrypt(ctx, tweak, sizeof(tweak), plaintext, ciphertext, 16);
 
 // Decrypt data
 uint8_t decrypted[16];
-fast_decrypt(ctx, ciphertext, decrypted, 16);
+fast_decrypt(ctx, tweak, sizeof(tweak), ciphertext, decrypted, 16);
 
 // Cleanup
 fast_cleanup(ctx);
@@ -67,6 +68,7 @@ fast_cleanup(ctx);
 - `sbox_count`: Number of S-boxes in the pool (default: 256)
 - `num_layers`: Number of SPN layers for security
 - `branch_dist1`, `branch_dist2`: Branch distances for diffusion
+- `security_level`: Target classical security in bits (default 128)
 
 ## References
 
