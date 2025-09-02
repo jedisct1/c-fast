@@ -24,7 +24,7 @@ calculate_recommended_params(fast_params_t *params, uint32_t radix, uint32_t wor
     params->sbox_count  = FAST_SBOX_POOL_SIZE;
 
     params->branch_dist1 = (uint32_t) ceil(sqrt(word_length));
-    params->branch_dist2 = params->branch_dist1 > 1 ? params->branch_dist1 - 1 : 1;
+    params->branch_dist2 = params->branch_dist1;
 
     params->num_layers = (uint32_t) ceil(pow(word_length, 1.5));
 
