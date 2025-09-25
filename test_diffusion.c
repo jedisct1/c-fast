@@ -32,27 +32,6 @@ count_different_bytes(const uint8_t *a, const uint8_t *b, size_t length)
     return count;
 }
 
-static int
-hamming_weight(uint8_t byte)
-{
-    int weight = 0;
-    while (byte) {
-        weight += byte & 1;
-        byte >>= 1;
-    }
-    return weight;
-}
-
-static int
-hamming_distance(const uint8_t *a, const uint8_t *b, size_t length)
-{
-    int distance = 0;
-    for (size_t i = 0; i < length; i++) {
-        distance += hamming_weight(a[i] ^ b[i]);
-    }
-    return distance;
-}
-
 static void
 test_single_bit_flip(fast_context_t *ctx, size_t word_length, diffusion_stats_t *stats)
 {
