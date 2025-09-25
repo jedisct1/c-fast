@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <openssl/evp.h>
 
 #define FAST_MASTER_KEY_SIZE  FAST_AES_KEY_SIZE
 #define FAST_DERIVED_KEY_SIZE 32U
@@ -24,10 +25,10 @@ typedef struct {
 } sbox_pool_t;
 
 typedef struct {
-    uint8_t key[FAST_AES_KEY_SIZE];
-    uint8_t counter[FAST_AES_BLOCK_SIZE];
-    uint8_t buffer[FAST_AES_BLOCK_SIZE];
-    size_t  buffer_pos;
+    EVP_CIPHER_CTX *ctx; // Reusable AES-128-ECB context for the PRNG
+    uint8_t         counter[FAST_AES_BLOCK_SIZE];
+    uint8_t         buffer[FAST_AES_BLOCK_SIZE];
+    size_t          buffer_pos;
 } prng_state_t;
 
 // S-box functions

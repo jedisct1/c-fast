@@ -464,22 +464,13 @@ fast_encrypt(fast_context_t *ctx, const uint8_t *tweak, size_t tweak_len, const 
         return -1;
     }
 
-    uint8_t *working = malloc(length);
-    if (!working) {
-        return -1;
-    }
-
     for (size_t i = 0; i < length; i++) {
         if (plaintext[i] >= ctx->params.radix) {
-            free(working);
             return -1;
         }
-        working[i] = plaintext[i];
     }
 
-    fast_cenc(&ctx->params, ctx->sbox_pool, ctx->seq_buffer, working, ciphertext, length);
-
-    free(working);
+    fast_cenc(&ctx->params, ctx->sbox_pool, ctx->seq_buffer, plaintext, ciphertext, length);
     return 0;
 }
 
@@ -503,21 +494,12 @@ fast_decrypt(fast_context_t *ctx, const uint8_t *tweak, size_t tweak_len, const 
         return -1;
     }
 
-    uint8_t *working = malloc(length);
-    if (!working) {
-        return -1;
-    }
-
     for (size_t i = 0; i < length; i++) {
         if (ciphertext[i] >= ctx->params.radix) {
-            free(working);
             return -1;
         }
-        working[i] = ciphertext[i];
     }
 
-    fast_cdec(&ctx->params, ctx->sbox_pool, ctx->seq_buffer, working, plaintext, length);
-
-    free(working);
+    fast_cdec(&ctx->params, ctx->sbox_pool, ctx->seq_buffer, ciphertext, plaintext, length);
     return 0;
 }

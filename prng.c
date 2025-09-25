@@ -1,6 +1,4 @@
 #include "fast_internal.h"
-#include <openssl/aes.h>
-#include <openssl/evp.h>
 #include <string.h>
 
 static void
@@ -20,7 +18,22 @@ prng_init(prng_state_t *prng, const uint8_t *key, const uint8_t *nonce)
         return -1;
     }
 
-    memcpy(prng->key, key, FAST_AES_KEY_SIZE);
+    prng->ctx = EVP_CIPHER_CTX_new();
+    if (!prng->ctx) {
+        return -1;
+    }
+
+    if (EVP_EncryptInit_ex(prng->ctx, EVP_aes_128_ecb(), NULL, key, NULL) != 1) {
+        EVP_CIPHER_CTX_free(prng->ctx);
+        prng->ctx = NULL;
+        return -1;
+    }
+
+    if (EVP_CIPHER_CTX_set_padding(prng->ctx, 0) != 1) {
+        EVP_CIPHER_CTX_free(prng->ctx);
+        prng->ctx = NULL;
+        return -1;
+    }
     memset(prng->counter, 0, FAST_AES_BLOCK_SIZE);
 
     if (nonce) {
@@ -31,21 +44,6 @@ prng_init(prng_state_t *prng, const uint8_t *key, const uint8_t *nonce)
     prng->buffer_pos = FAST_AES_BLOCK_SIZE;
 
     return 0;
-}
-
-static void
-aes_encrypt_block(const uint8_t *key, const uint8_t *input, uint8_t *output)
-{
-    EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
-    if (!ctx)
-        return;
-
-    int len;
-    EVP_EncryptInit_ex(ctx, EVP_aes_128_ecb(), NULL, key, NULL);
-    EVP_CIPHER_CTX_set_padding(ctx, 0);
-    EVP_EncryptUpdate(ctx, output, &len, input, FAST_AES_BLOCK_SIZE);
-
-    EVP_CIPHER_CTX_free(ctx);
 }
 
 void
@@ -60,7 +58,14 @@ prng_get_bytes(prng_state_t *prng, uint8_t *output, size_t length)
     while (bytes_copied < length) {
         if (prng->buffer_pos >= FAST_AES_BLOCK_SIZE) {
             increment_counter(prng->counter);
-            aes_encrypt_block(prng->key, prng->counter, prng->buffer);
+            int out_len = 0;
+            if (EVP_EncryptUpdate(prng->ctx, prng->buffer, &out_len, prng->counter,
+                                   FAST_AES_BLOCK_SIZE) != 1 ||
+                out_len != FAST_AES_BLOCK_SIZE) {
+                memset(prng->buffer, 0, FAST_AES_BLOCK_SIZE);
+                prng->buffer_pos = FAST_AES_BLOCK_SIZE;
+                return;
+            }
             prng->buffer_pos = 0;
         }
 
@@ -114,7 +119,10 @@ prng_cleanup(prng_state_t *prng)
         return;
     }
 
-    memset(prng->key, 0, FAST_AES_KEY_SIZE);
+    if (prng->ctx) {
+        EVP_CIPHER_CTX_free(prng->ctx);
+        prng->ctx = NULL;
+    }
     memset(prng->counter, 0, FAST_AES_BLOCK_SIZE);
     memset(prng->buffer, 0, FAST_AES_BLOCK_SIZE);
     prng->buffer_pos = 0;
