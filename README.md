@@ -10,23 +10,43 @@ FAST is a format-preserving encryption scheme designed for arbitrary radix value
 
 - Format-preserving encryption for arbitrary radix (4-256)
 - Configurable word lengths and security parameters
-- S-box pool generation using AES-based PRF
+- S-box pool generation using AES-based PRNG
 - Multi-layer SPN (Substitution-Permutation Network) structure
 - Comprehensive test suite with edge case handling
+- Tweak support for domain separation
+- HMAC-SHA256 based PRF for key derivation
+
+## Requirements
+
+- GCC or compatible C compiler
+- OpenSSL 3.x
+- Make build system
+
+On macOS with Homebrew:
+
+```bash
+brew install openssl@3
+```
 
 ## Building
 
 Build the library and test suite:
+
 ```bash
 make
 ```
 
 Run tests:
+
 ```bash
-make test
+make test             # Run basic test suite
+make test_edge_cases  # Build edge case tests (run with ./test_edge_cases)
+make diffusion        # Run diffusion tests
+make benchmark        # Run performance benchmarks
 ```
 
 Clean build artifacts:
+
 ```bash
 make clean
 ```
