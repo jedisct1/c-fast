@@ -6,7 +6,7 @@
 #include <string.h>
 #include <time.h>
 
-static const uint8_t DEFAULT_TWEAK[]    = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77 };
+static const uint8_t DEFAULT_TWEAK[]   = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77 };
 static const size_t  DEFAULT_TWEAK_LEN = sizeof(DEFAULT_TWEAK);
 
 void
@@ -125,12 +125,11 @@ test_different_inputs()
         printf("\nTest case %d:\n", i + 1);
         print_array("  Input    ", test_cases[i], 8);
 
-        assert(fast_encrypt(ctx, DEFAULT_TWEAK, DEFAULT_TWEAK_LEN, test_cases[i], ciphertext,
-                            8) == 0);
+        assert(fast_encrypt(ctx, DEFAULT_TWEAK, DEFAULT_TWEAK_LEN, test_cases[i], ciphertext, 8) ==
+               0);
         print_array("  Encrypted", ciphertext, 8);
 
-        assert(fast_decrypt(ctx, DEFAULT_TWEAK, DEFAULT_TWEAK_LEN, ciphertext, recovered,
-                            8) == 0);
+        assert(fast_decrypt(ctx, DEFAULT_TWEAK, DEFAULT_TWEAK_LEN, ciphertext, recovered, 8) == 0);
         print_array("  Decrypted", recovered, 8);
 
         assert(memcmp(test_cases[i], recovered, 8) == 0);

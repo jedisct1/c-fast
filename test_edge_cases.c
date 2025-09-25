@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static const uint8_t EDGE_TWEAK[]    = { 0x10, 0x20, 0x30, 0x40 };
+static const uint8_t EDGE_TWEAK[]   = { 0x10, 0x20, 0x30, 0x40 };
 static const size_t  EDGE_TWEAK_LEN = sizeof(EDGE_TWEAK);
 
 void

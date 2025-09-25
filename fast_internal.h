@@ -6,7 +6,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define FAST_MASTER_KEY_SIZE FAST_AES_KEY_SIZE
+#define FAST_MASTER_KEY_SIZE  FAST_AES_KEY_SIZE
 #define FAST_DERIVED_KEY_SIZE 32U
 
 // Internal data structures

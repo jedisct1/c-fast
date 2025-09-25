@@ -28,30 +28,30 @@ static const uint8_t LABEL_FPE_SEQ[]   = "FPE SEQ";
 static const uint8_t LABEL_TWEAK[]     = "tweak";
 
 static const uint32_t k_round_l_values[] = { 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 16, 32, 50, 64, 100 };
-static const uint32_t k_round_radices[] = { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 100, 128,
-                                           256, 1000, 1024, 10000, 65536 };
+static const uint32_t k_round_radices[]  = { 4,  5,  6,  7,   8,   9,   10,   11,   12,    13,
+                                             14, 15, 16, 100, 128, 256, 1000, 1024, 10000, 65536 };
 
 static const uint16_t k_round_table[][15] = {
-    { 165, 135, 117, 105, 96, 89, 83, 78, 74, 68, 59, 52, 52, 53, 57 },   // a = 4
-    { 131, 107, 93, 83, 76, 70, 66, 62, 59, 54, 48, 46, 47, 48, 53 },    // a = 5
-    { 113, 92, 80, 72, 65, 61, 57, 54, 51, 46, 44, 43, 44, 46, 52 },     // a = 6
-    { 102, 83, 72, 64, 59, 55, 51, 48, 46, 43, 41, 41, 43, 45, 50 },     // a = 7
-    { 94, 76, 66, 59, 54, 50, 47, 44, 42, 41, 39, 39, 42, 44, 50 },      // a = 8
-    { 88, 72, 62, 56, 51, 47, 44, 42, 40, 39, 38, 38, 41, 43, 49 },      // a = 9
-    { 83, 68, 59, 53, 48, 45, 42, 39, 39, 38, 37, 37, 40, 43, 49 },      // a = 10
-    { 79, 65, 56, 50, 46, 43, 40, 38, 38, 37, 36, 37, 40, 42, 48 },      // a = 11
-    { 76, 62, 54, 48, 44, 41, 38, 37, 37, 36, 35, 36, 39, 42, 48 },      // a = 12
-    { 73, 60, 52, 47, 43, 39, 37, 36, 36, 35, 34, 36, 39, 41, 48 },      // a = 13
-    { 71, 58, 50, 45, 41, 38, 36, 36, 35, 34, 34, 35, 39, 41, 47 },      // a = 14
-    { 69, 57, 49, 44, 40, 37, 36, 35, 34, 34, 33, 35, 38, 41, 47 },      // a = 15
-    { 67, 55, 48, 43, 39, 36, 35, 34, 34, 33, 33, 35, 38, 41, 47 },      // a = 16
-    { 40, 33, 28, 27, 26, 26, 25, 25, 25, 26, 26, 30, 34, 37, 44 },      // a = 100
-    { 38, 31, 27, 26, 25, 25, 25, 25, 25, 25, 26, 30, 34, 37, 44 },      // a = 128
-    { 33, 27, 25, 24, 23, 23, 23, 23, 23, 24, 25, 29, 33, 37, 44 },      // a = 256
-    { 32, 22, 21, 21, 21, 21, 21, 21, 21, 22, 23, 28, 32, 36, 43 },      // a = 1000
-    { 32, 22, 21, 21, 21, 21, 21, 21, 21, 22, 23, 28, 32, 36, 43 },      // a = 1024
-    { 32, 22, 18, 18, 18, 18, 19, 19, 19, 20, 21, 27, 32, 35, 42 },      // a = 10000
-    { 32, 22, 17, 17, 17, 17, 17, 18, 18, 19, 21, 26, 31, 35, 42 }       // a = 65536
+    { 165, 135, 117, 105, 96, 89, 83, 78, 74, 68, 59, 52, 52, 53, 57 }, // a = 4
+    { 131, 107, 93, 83, 76, 70, 66, 62, 59, 54, 48, 46, 47, 48, 53 }, // a = 5
+    { 113, 92, 80, 72, 65, 61, 57, 54, 51, 46, 44, 43, 44, 46, 52 }, // a = 6
+    { 102, 83, 72, 64, 59, 55, 51, 48, 46, 43, 41, 41, 43, 45, 50 }, // a = 7
+    { 94, 76, 66, 59, 54, 50, 47, 44, 42, 41, 39, 39, 42, 44, 50 }, // a = 8
+    { 88, 72, 62, 56, 51, 47, 44, 42, 40, 39, 38, 38, 41, 43, 49 }, // a = 9
+    { 83, 68, 59, 53, 48, 45, 42, 39, 39, 38, 37, 37, 40, 43, 49 }, // a = 10
+    { 79, 65, 56, 50, 46, 43, 40, 38, 38, 37, 36, 37, 40, 42, 48 }, // a = 11
+    { 76, 62, 54, 48, 44, 41, 38, 37, 37, 36, 35, 36, 39, 42, 48 }, // a = 12
+    { 73, 60, 52, 47, 43, 39, 37, 36, 36, 35, 34, 36, 39, 41, 48 }, // a = 13
+    { 71, 58, 50, 45, 41, 38, 36, 36, 35, 34, 34, 35, 39, 41, 47 }, // a = 14
+    { 69, 57, 49, 44, 40, 37, 36, 35, 34, 34, 33, 35, 38, 41, 47 }, // a = 15
+    { 67, 55, 48, 43, 39, 36, 35, 34, 34, 33, 33, 35, 38, 41, 47 }, // a = 16
+    { 40, 33, 28, 27, 26, 26, 25, 25, 25, 26, 26, 30, 34, 37, 44 }, // a = 100
+    { 38, 31, 27, 26, 25, 25, 25, 25, 25, 25, 26, 30, 34, 37, 44 }, // a = 128
+    { 33, 27, 25, 24, 23, 23, 23, 23, 23, 24, 25, 29, 33, 37, 44 }, // a = 256
+    { 32, 22, 21, 21, 21, 21, 21, 21, 21, 22, 23, 28, 32, 36, 43 }, // a = 1000
+    { 32, 22, 21, 21, 21, 21, 21, 21, 21, 22, 23, 28, 32, 36, 43 }, // a = 1024
+    { 32, 22, 18, 18, 18, 18, 19, 19, 19, 20, 21, 27, 32, 35, 42 }, // a = 10000
+    { 32, 22, 17, 17, 17, 17, 17, 18, 18, 19, 21, 26, 31, 35, 42 } // a = 65536
 };
 
 static void
@@ -80,8 +80,8 @@ interpolate(double x, double x0, double x1, double y0, double y1)
 static double
 rounds_for_row(size_t row_index, double ell)
 {
-    const size_t l_count = sizeof(k_round_l_values) / sizeof(k_round_l_values[0]);
-    const uint16_t *row  = k_round_table[row_index];
+    const size_t    l_count = sizeof(k_round_l_values) / sizeof(k_round_l_values[0]);
+    const uint16_t *row     = k_round_table[row_index];
 
     if (ell <= k_round_l_values[0]) {
         return (double) row[0];
@@ -229,29 +229,28 @@ ensure_sequence(fast_context_t *ctx, const uint8_t *tweak, size_t tweak_len)
     }
 
     if (ctx->has_cached_seq && ctx->cached_tweak_len == tweak_len) {
-        if (tweak_len == 0 || (ctx->cached_tweak && tweak &&
-                               memcmp(ctx->cached_tweak, tweak, tweak_len) == 0)) {
+        if (tweak_len == 0 ||
+            (ctx->cached_tweak && tweak && memcmp(ctx->cached_tweak, tweak, tweak_len) == 0)) {
             return 0;
         }
     }
 
-    uint8_t *input      = NULL;
-    size_t   input_len  = 0;
+    uint8_t *input     = NULL;
+    size_t   input_len = 0;
     uint8_t  kseq_material[FAST_DERIVED_KEY_SIZE];
-    int      status     = -1;
+    int      status = -1;
 
     if (build_setup2_input(&ctx->params, tweak, tweak_len, &input, &input_len) != 0) {
         return -1;
     }
 
-    if (prf_derive_key(ctx->master_key, input, input_len, kseq_material,
-                       sizeof(kseq_material)) != 0) {
+    if (prf_derive_key(ctx->master_key, input, input_len, kseq_material, sizeof(kseq_material)) !=
+        0) {
         goto cleanup;
     }
 
-    if (fast_generate_sequence(ctx->seq_buffer, ctx->params.num_layers,
-                               ctx->params.sbox_count, kseq_material,
-                               sizeof(kseq_material)) != 0) {
+    if (fast_generate_sequence(ctx->seq_buffer, ctx->params.num_layers, ctx->params.sbox_count,
+                               kseq_material, sizeof(kseq_material)) != 0) {
         goto cleanup;
     }
 
@@ -292,9 +291,9 @@ calculate_recommended_params(fast_params_t *params, uint32_t radix, uint32_t wor
         return -1;
     }
 
-    params->radix       = radix;
-    params->word_length = word_length;
-    params->sbox_count  = FAST_SBOX_POOL_SIZE;
+    params->radix          = radix;
+    params->word_length    = word_length;
+    params->sbox_count     = FAST_SBOX_POOL_SIZE;
     params->security_level = params->security_level ? params->security_level : 128;
 
     // Branch distances per specification
@@ -302,7 +301,7 @@ calculate_recommended_params(fast_params_t *params, uint32_t radix, uint32_t wor
     if (word_length <= 2) {
         params->branch_dist1 = 0;
     } else {
-        uint32_t upper = (word_length > 2) ? (word_length - 2) : 0;
+        uint32_t upper       = (word_length > 2) ? (word_length - 2) : 0;
         params->branch_dist1 = (w_candidate < upper) ? w_candidate : upper;
     }
     params->branch_dist2 = (params->branch_dist1 > 1) ? (params->branch_dist1 - 1) : 1;
@@ -312,7 +311,7 @@ calculate_recommended_params(fast_params_t *params, uint32_t radix, uint32_t wor
         rounds = 1.0;
     }
 
-    uint32_t rounds_u = (uint32_t) ceil(rounds);
+    uint32_t rounds_u  = (uint32_t) ceil(rounds);
     params->num_layers = rounds_u * params->word_length;
 
     return 0;
@@ -446,8 +445,8 @@ fast_cleanup(fast_context_t *ctx)
 }
 
 int
-fast_encrypt(fast_context_t *ctx, const uint8_t *tweak, size_t tweak_len,
-             const uint8_t *plaintext, uint8_t *ciphertext, size_t length)
+fast_encrypt(fast_context_t *ctx, const uint8_t *tweak, size_t tweak_len, const uint8_t *plaintext,
+             uint8_t *ciphertext, size_t length)
 {
     if (!ctx || !plaintext || !ciphertext) {
         return -1;
@@ -485,8 +484,8 @@ fast_encrypt(fast_context_t *ctx, const uint8_t *tweak, size_t tweak_len,
 }
 
 int
-fast_decrypt(fast_context_t *ctx, const uint8_t *tweak, size_t tweak_len,
-             const uint8_t *ciphertext, uint8_t *plaintext, size_t length)
+fast_decrypt(fast_context_t *ctx, const uint8_t *tweak, size_t tweak_len, const uint8_t *ciphertext,
+             uint8_t *plaintext, size_t length)
 {
     if (!ctx || !ciphertext || !plaintext) {
         return -1;

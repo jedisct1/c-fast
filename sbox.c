@@ -37,8 +37,8 @@ generate_sbox(sbox_t *sbox, uint32_t radix, prng_state_t *prng)
     }
 
     for (uint32_t i = radix; i > 1; i--) {
-        uint32_t j    = prng_uniform(prng, i);
-        uint8_t  temp = sbox->perm[i - 1];
+        uint32_t j        = prng_uniform(prng, i);
+        uint8_t  temp     = sbox->perm[i - 1];
         sbox->perm[i - 1] = sbox->perm[j];
         sbox->perm[j]     = temp;
     }

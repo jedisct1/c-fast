@@ -82,8 +82,8 @@ prng_next_u32(prng_state_t *prng)
 
     uint8_t bytes[4];
     prng_get_bytes(prng, bytes, sizeof(bytes));
-    return ((uint32_t) bytes[0] << 24) | ((uint32_t) bytes[1] << 16) |
-           ((uint32_t) bytes[2] << 8) | ((uint32_t) bytes[3]);
+    return ((uint32_t) bytes[0] << 24) | ((uint32_t) bytes[1] << 16) | ((uint32_t) bytes[2] << 8) |
+           ((uint32_t) bytes[3]);
 }
 
 uint32_t
@@ -93,15 +93,15 @@ prng_uniform(prng_state_t *prng, uint32_t bound)
         return 0;
     }
 
-    const uint64_t bound64    = (uint64_t) bound;
-    const uint32_t threshold  = (uint32_t) ((0u - bound) % bound);
+    const uint64_t bound64   = (uint64_t) bound;
+    const uint32_t threshold = (uint32_t) ((0u - bound) % bound);
     uint32_t       r, low;
     uint64_t       product;
 
     do {
-        r        = prng_next_u32(prng);
-        product  = (uint64_t) r * bound64;
-        low      = (uint32_t) product;
+        r       = prng_next_u32(prng);
+        product = (uint64_t) r * bound64;
+        low     = (uint32_t) product;
     } while (low < threshold);
 
     return (uint32_t) (product >> 32);
@@ -121,8 +121,8 @@ prng_cleanup(prng_state_t *prng)
 }
 
 static void
-split_key_material(const uint8_t *key_material, uint8_t *key_out,
-                   uint8_t *iv_out, bool zeroize_iv_suffix)
+split_key_material(const uint8_t *key_material, uint8_t *key_out, uint8_t *iv_out,
+                   bool zeroize_iv_suffix)
 {
     memcpy(key_out, key_material, FAST_AES_KEY_SIZE);
     memcpy(iv_out, key_material + FAST_AES_KEY_SIZE, FAST_AES_BLOCK_SIZE);

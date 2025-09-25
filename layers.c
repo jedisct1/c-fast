@@ -27,8 +27,7 @@ sub_mod256(uint8_t a, uint8_t b)
 }
 
 static inline void
-fast_es_layer_radix256(uint8_t *data, uint32_t ell, uint32_t w, uint32_t wp,
-                       const sbox_t *sbox)
+fast_es_layer_radix256(uint8_t *data, uint32_t ell, uint32_t w, uint32_t wp, const sbox_t *sbox)
 {
     if (!sbox->perm) {
         return;
@@ -52,8 +51,7 @@ fast_es_layer_radix256(uint8_t *data, uint32_t ell, uint32_t w, uint32_t wp,
 }
 
 static inline void
-fast_ds_layer_radix256(uint8_t *data, uint32_t ell, uint32_t w, uint32_t wp,
-                       const sbox_t *sbox)
+fast_ds_layer_radix256(uint8_t *data, uint32_t ell, uint32_t w, uint32_t wp, const sbox_t *sbox)
 {
     if (!sbox->inv) {
         return;
