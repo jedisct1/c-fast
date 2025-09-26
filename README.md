@@ -14,7 +14,7 @@ FAST is a format-preserving encryption scheme designed for arbitrary radix value
 - Multi-layer SPN (Substitution-Permutation Network) structure
 - Comprehensive test suite with edge case handling
 - Tweak support for domain separation
-- HMAC-SHA256 based PRF for key derivation
+- AES-CMAC based PRF for key derivation
 
 ## Requirements
 
