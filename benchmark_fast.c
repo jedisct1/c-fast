@@ -102,8 +102,8 @@ benchmark_different_parameters()
         uint32_t radix;
         uint32_t word_length;
     } test_configs[] = {
-        { 4, 16 },  { 8, 16 }, { 10, 16 }, { 16, 16 }, { 32, 16 },
-        { 64, 16 }, { 256, 16 }, { 10, 8 }, { 10, 32 }, { 10, 64 }, { 10, 128 },
+        { 4, 16 },   { 8, 16 }, { 10, 16 }, { 16, 16 }, { 32, 16 },  { 64, 16 },
+        { 256, 16 }, { 10, 8 }, { 10, 32 }, { 10, 64 }, { 10, 128 },
     };
 
     for (size_t i = 0; i < sizeof(test_configs) / sizeof(test_configs[0]); i++) {

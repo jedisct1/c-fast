@@ -31,7 +31,7 @@ fast_cdec(const fast_params_t *params, const sbox_pool_t *pool, const uint32_t *
         memcpy(output, input, length);
     }
 
-    for (int i = params->num_layers - 1; i >= 0; i--) {
+    for (int i = (int) params->num_layers - 1; i >= 0; i--) {
         uint32_t sbox_index = seq ? seq[i] : ((uint32_t) i % pool->count);
         fast_ds_layer(params, pool, output, length, sbox_index);
     }

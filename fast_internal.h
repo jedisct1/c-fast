@@ -2,10 +2,10 @@
 #define FAST_INTERNAL_H
 
 #include "fast.h"
+#include <openssl/evp.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <openssl/evp.h>
 
 #define FAST_MASTER_KEY_SIZE  FAST_AES_KEY_SIZE
 #define FAST_DERIVED_KEY_SIZE 32U

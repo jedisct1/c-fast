@@ -60,7 +60,7 @@ prng_get_bytes(prng_state_t *prng, uint8_t *output, size_t length)
             increment_counter(prng->counter);
             int out_len = 0;
             if (EVP_EncryptUpdate(prng->ctx, prng->buffer, &out_len, prng->counter,
-                                   FAST_AES_BLOCK_SIZE) != 1 ||
+                                  FAST_AES_BLOCK_SIZE) != 1 ||
                 out_len != FAST_AES_BLOCK_SIZE) {
                 memset(prng->buffer, 0, FAST_AES_BLOCK_SIZE);
                 prng->buffer_pos = FAST_AES_BLOCK_SIZE;
