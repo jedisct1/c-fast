@@ -6,6 +6,8 @@ A C implementation of the FAST (Format-preserving, Additive, Symmetric Translati
 
 FAST is a format-preserving encryption scheme designed for arbitrary radix values and word lengths. This implementation provides a complete cryptographic library for performing format-preserving encryption while maintaining the structure and format of input data.
 
+This implementation is fully compatible with the [FAST implementation in Zig](https://github.com/jedisct1/zig-fast).
+
 ## Features
 
 - Format-preserving encryption for arbitrary radix (4-256)
