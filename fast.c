@@ -180,10 +180,10 @@ build_setup1_input(const fast_params_t *params, uint8_t **out, size_t *out_len)
     write_u32_be(params->radix, a_be);
     write_u32_be(params->sbox_count, m_be);
 
-    prf_part_t parts[] = { { LABEL_INSTANCE1, sizeof(LABEL_INSTANCE1) },
+    prf_part_t parts[] = { { LABEL_INSTANCE1, sizeof(LABEL_INSTANCE1) - 1 },
                            { a_be, sizeof(a_be) },
                            { m_be, sizeof(m_be) },
-                           { LABEL_FPE_POOL, sizeof(LABEL_FPE_POOL) } };
+                           { LABEL_FPE_POOL, sizeof(LABEL_FPE_POOL) - 1 } };
 
     return encode_parts(out, out_len, parts, sizeof(parts) / sizeof(parts[0]));
 }
@@ -206,16 +206,16 @@ build_setup2_input(const fast_params_t *params, const uint8_t *tweak, size_t twe
     write_u32_be(params->branch_dist1, w_be);
     write_u32_be(params->branch_dist2, wp_be);
 
-    prf_part_t parts[] = { { LABEL_INSTANCE1, sizeof(LABEL_INSTANCE1) },
+    prf_part_t parts[] = { { LABEL_INSTANCE1, sizeof(LABEL_INSTANCE1) - 1 },
                            { a_be, sizeof(a_be) },
                            { m_be, sizeof(m_be) },
-                           { LABEL_INSTANCE2, sizeof(LABEL_INSTANCE2) },
+                           { LABEL_INSTANCE2, sizeof(LABEL_INSTANCE2) - 1 },
                            { ell_be, sizeof(ell_be) },
                            { n_be, sizeof(n_be) },
                            { w_be, sizeof(w_be) },
                            { wp_be, sizeof(wp_be) },
-                           { LABEL_FPE_SEQ, sizeof(LABEL_FPE_SEQ) },
-                           { LABEL_TWEAK, sizeof(LABEL_TWEAK) },
+                           { LABEL_FPE_SEQ, sizeof(LABEL_FPE_SEQ) - 1 },
+                           { LABEL_TWEAK, sizeof(LABEL_TWEAK) - 1 },
                            { tweak, tweak_len } };
 
     return encode_parts(out, out_len, parts, sizeof(parts) / sizeof(parts[0]));
