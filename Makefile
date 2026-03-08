@@ -13,6 +13,7 @@ TEST_TARGET = test_fast
 EDGE_TEST_TARGET = test_edge_cases
 BENCHMARK_TARGET = benchmark_fast
 DIFFUSION_TARGET = test_diffusion
+GEN_VECTORS_TARGET = gen_vectors
 
 all: $(TARGET) $(TEST_TARGET)
 
@@ -37,6 +38,9 @@ $(BENCHMARK_TARGET): benchmark_fast.c $(TARGET)
 $(DIFFUSION_TARGET): test_diffusion.c $(TARGET)
 	$(CC) $(CFLAGS) -o $@ test_diffusion.c $(TARGET) $(LDFLAGS)
 
+$(GEN_VECTORS_TARGET): gen_vectors.c $(TARGET)
+	$(CC) $(CFLAGS) -o $@ gen_vectors.c $(TARGET) $(LDFLAGS)
+
 benchmark: $(BENCHMARK_TARGET)
 	./$(BENCHMARK_TARGET)
 
@@ -44,6 +48,6 @@ diffusion: $(DIFFUSION_TARGET)
 	./$(DIFFUSION_TARGET)
 
 clean:
-	rm -f $(OBJS) $(TEST_OBJS) $(TARGET) $(TEST_TARGET) $(EDGE_TEST_TARGET) $(BENCHMARK_TARGET) $(DIFFUSION_TARGET)
+	rm -f $(OBJS) $(TEST_OBJS) $(TARGET) $(TEST_TARGET) $(EDGE_TEST_TARGET) $(BENCHMARK_TARGET) $(DIFFUSION_TARGET) $(GEN_VECTORS_TARGET)
 
 .PHONY: all test clean benchmark diffusion
