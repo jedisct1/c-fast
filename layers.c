@@ -66,7 +66,7 @@ fast_ds_layer_radix256(uint8_t *data, uint32_t ell, uint32_t w, uint32_t wp, con
         uint8_t wrapped = add_mod256(x_last, data[w - 1]);
         intermediate    = inv[wrapped];
     } else {
-        intermediate = inv[inv[x_last]];
+        intermediate = inv[x_last];
     }
 
     uint8_t new_first = sub_mod256(intermediate, data[ell - wp - 1]);
